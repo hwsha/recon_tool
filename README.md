@@ -1,5 +1,5 @@
 To do:
-- [ ] add url crawling
+- [X] add url crawling
 - [ ] add port scanning
 - [ ] add low hanging fruits testing
 - [ ] add colours to the terminal
