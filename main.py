@@ -1,6 +1,6 @@
 import argparse
 import os
-from core.utils import results_directory, check_path_exist, load_old_results, save_results
+from core.utils import results_directory, check_path_exist, load_old_results, save_results, extract_urls
 from core.subdomains import gather_subdomains
 from core.resolver import resolve_domains
 from core.webprobe import probe_web_services
@@ -13,8 +13,8 @@ def main():
     parser.add_argument("--skip-subdomains", action="store_true", help="Skip subdomain enumeration")
     parser.add_argument("--skip-resolution", action="store_true", help="Skip DNS resolution")
     parser.add_argument("--skip-web", action="store_true", help="Skip web probing")
-    parser.add_argument("--skip-urls", action="store_true", help="Skip URL discovery")
-    parser.add_argument("--use-active-crawler", action="store_true", help="Use active crawling (katana)")
+    parser.add_argument("--passive-url-crawler", action="store_true", help="Passive URL discovery")
+    parser.add_argument("--active-url-crawler", action="store_true", help="Active URL discovery")
     args = parser.parse_args()
 
     target_name, results_path = results_directory()
@@ -33,6 +33,8 @@ def main():
     new_subdomains = set()
     to_resolve = set(old_subdomains)
     to_probe = set(old_resolved_domains)
+    to_crawl = set(extract_urls(old_webservices))
+    urls = set(old_urls)
 
     if args.target:
         targets.add(args.target)
@@ -66,14 +68,21 @@ def main():
             new_web_services = probe_web_services(to_probe, old_webservices)
             if new_web_services:
                 save_results(os.path.join(results_path, f"{target_name}_webservices.txt"), new_web_services)
+                to_crawl.update(new_web_services)
         
-    # if not args.skip_urls:
-    #     if webservices:
-    #         urls.update(passive_url_discovery(live_urls, "global", output_dir))
-    #         if args.use_active_crawler:
-    #             active_url_discovery(live_urls, "global", output_dir)
-    #     else:
-    #         print("[!] No live URLs found to perform URL discovery.")
+    if args.passive_url_crawler:
+        if to_crawl:
+            new_urls = passive_url_discovery(to_crawl, old_urls)
+            if new_urls:
+                save_results(os.path.join(results_path, f"{target_name}_urls.txt"), new_urls)
+                urls.update(new_urls)
+    
+    if args.active_url_crawler:
+        if to_crawl:
+            new_urls = active_url_discovery(to_crawl, old_urls)
+            if new_urls:
+                save_results(os.path.join(results_path, f"{target_name}_urls.txt"), new_urls)
+                urls.update(new_urls)
 
     print(f"\n[+] Passive Recon Complete. Results saved in {results_path}/")
 

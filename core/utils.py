@@ -7,15 +7,15 @@ def run_command(command):
     except subprocess.CalledProcessError:
         return set()
     
-def extract_urls(httpx_output_lines):
-    urls = []
-    for line in httpx_output_lines:
+def extract_urls(httpx_output):
+    urls = set()
+    for line in httpx_output:
         parts = line.split(" ")
         if parts:
             url = parts[0].strip()
             if url.startswith("http"):
-                urls.append(url)
-    return list(set(urls))    
+                urls.add(url)
+    return urls 
     
 def get_diff(new_set, old_set, label="placeholder"):
     diff = new_set - old_set
