@@ -1,11 +1,13 @@
 import subprocess
 import os
 
-def run_command(command):
-    try:
-        return set(subprocess.check_output(command, shell=True, text=True).strip().split('\n'))
-    except subprocess.CalledProcessError:
-        return set()
+def run_command(command, input_data=None):
+    result = subprocess.run(
+        command, input=input_data, shell=True, text=True,
+        stdout=subprocess.PIPE, stderr=subprocess.PIPE
+    )
+    output = result.stdout.strip().split('\n')
+    return set(output) if output != [''] else set()
     
 def extract_urls(httpx_output):
     urls = set()

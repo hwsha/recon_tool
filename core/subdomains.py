@@ -3,7 +3,7 @@ import os
 
 def gather_subdomains(target, old_subdomains):
     print(f"[+] Gathering subdomains for {target} using Subfinder...")
-    subdomains = run_command(f"subfinder -all -silent -d {target}")
+    subdomains = run_command("subfinder -all -silent", input_data=target)
     print("\n[+] Subdomains Found:")
     for subdomain in subdomains:
         print(subdomain)

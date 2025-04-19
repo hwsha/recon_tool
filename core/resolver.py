@@ -3,7 +3,8 @@ import os
 
 def resolve_domains(domains, old_resolved_domains):
     print("[+] Resolving domains using dnsx...")
-    resolved_domains = run_command("echo '" + "\n".join(domains) + "' | dnsx -silent")
+    input = "\n".join(domains)
+    resolved_domains = run_command("dnsx -silent", input_data=input)
     print("\n[+] Resolved Domains:")
     for domain in resolved_domains:
         print(domain)

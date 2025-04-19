@@ -4,7 +4,8 @@ from core.utils import run_command, get_diff
 
 def passive_url_discovery(webservices, old_urls):
     print("[+] Running passive URL discovery with urlfinder...")
-    urls = run_command("echo '" + "\n".join(webservices) + "' | urlfinder -all -silent")
+    input = "\n".join(webservices)
+    urls = run_command("urlfinder -all -silent", input_data=input)
     print("\n[+] URLs Found:")
     for url in urls:
         print(url)
@@ -12,7 +13,8 @@ def passive_url_discovery(webservices, old_urls):
 
 def active_url_discovery(webservices, old_urls):
     print("[+] Running active crawling with Katana...")
-    urls = run_command("echo '" + "\n".join(webservices) + "' | katana -silent")
+    input = "\n".join(webservices)
+    urls = run_command("katana -silent", input_data=input)
     print("\n[+] URLs Found:")
     for url in urls:
         print(url)
