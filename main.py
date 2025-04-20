@@ -68,7 +68,7 @@ def main():
             new_web_services = probe_web_services(to_probe, old_webservices)
             if new_web_services:
                 save_results(os.path.join(results_path, f"{target_name}_webservices.txt"), new_web_services)
-                to_crawl.update(new_web_services)
+                to_crawl.update(extract_urls(new_web_services))
         
     if args.passive_url_crawler:
         if to_crawl:

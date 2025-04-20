@@ -9,7 +9,7 @@ def passive_url_discovery(webservices, old_urls):
     print("\n[+] URLs Found:")
     for url in urls:
         print(url)
-    return get_diff(webservices, old_urls, label="urls")
+    return get_diff(urls, old_urls, label="urls")
 
 def active_url_discovery(webservices, old_urls):
     print("[+] Running active crawling with Katana...")
@@ -18,4 +18,4 @@ def active_url_discovery(webservices, old_urls):
     print("\n[+] URLs Found:")
     for url in urls:
         print(url)
-    return get_diff(webservices, old_urls, label="urls")
+    return get_diff(urls, old_urls, label="urls")
