@@ -5,11 +5,13 @@ from core.subdomains import gather_subdomains
 from core.resolver import resolve_domains
 from core.webprobe import probe_web_services
 from core.urlfinder import passive_url_discovery, active_url_discovery
+from core.lhf import scan_open_redirects
 
 def main():
     parser = argparse.ArgumentParser(description="Passive recon automation script")
     parser.add_argument("-t", "--target", help="Single target domain")
     parser.add_argument("-f", "--file", help="File containing list of targets")
+    parser.add_argument("-lhf", "--low-hanging-fruit", action="store_true", help="Scan for low hanging fruits")
     parser.add_argument("--skip-subdomains", action="store_true", help="Skip subdomain enumeration")
     parser.add_argument("--skip-resolution", action="store_true", help="Skip DNS resolution")
     parser.add_argument("--skip-web", action="store_true", help="Skip web probing")
@@ -83,8 +85,13 @@ def main():
             if new_urls:
                 save_results(os.path.join(results_path, f"{target_name}_urls.txt"), new_urls)
                 urls.update(new_urls)
+    
+    if args.low_hanging_fruit:
+        if urls:
+            scan_open_redirects(urls)
 
-    print(f"\n[+] Passive Recon Complete. Results saved in {results_path}/")
+
+    print(f"\n[+] Automatic Recon Complete. Results saved in {results_path}/")
 
 if __name__ == "__main__":
     main()
