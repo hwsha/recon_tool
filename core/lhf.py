@@ -26,10 +26,9 @@ def scan_low_hanging_fruits(urls):
     for template, path in TEMPLATES.items():
         print(f"\n[!] Running {template} scanner.")
         results = run_command(f"nuclei -silent -dast -t '{path}'", input_data=input)
-        if not results:
+        if results:
+            print(f"[+] {template} findings:")
+            for line in results:
+                print(line)
+        else:
             print(f"\n[!] No {template} found.")
-            return
-        
-        print(f"[+] {template} findings:")
-        for line in results:
-            print(line)
