@@ -1,7 +1,7 @@
 import argparse
 import os
 from core.utils import results_directory, check_path_exist, load_old_results, save_results, extract_urls
-from core.subdomains import gather_subdomains
+from core.subdomains import gather_subdomains, bruteforce_subdomains
 from core.resolver import resolve_domains
 from core.webprobe import probe_web_services
 from core.urlfinder import passive_url_discovery, active_url_discovery
@@ -11,12 +11,13 @@ def main():
     parser = argparse.ArgumentParser(description="Passive recon automation script")
     parser.add_argument("-t", "--target", help="Single target domain")
     parser.add_argument("-f", "--file", help="File containing list of targets")
+    parser.add_argument("-b","--bruteforce-subdomains", action="store_true", help="Subdomain bruteforce")
+    parser.add_argument("-puc","--passive-url-crawler", action="store_true", help="Passive URL discovery")
+    parser.add_argument("-auc","--active-url-crawler", action="store_true", help="Active URL discovery")
     parser.add_argument("-lhf", "--low-hanging-fruit", action="store_true", help="Scan for low hanging fruits")
-    parser.add_argument("--skip-subdomains", action="store_true", help="Skip subdomain enumeration")
-    parser.add_argument("--skip-resolution", action="store_true", help="Skip DNS resolution")
-    parser.add_argument("--skip-web", action="store_true", help="Skip web probing")
-    parser.add_argument("--passive-url-crawler", action="store_true", help="Passive URL discovery")
-    parser.add_argument("--active-url-crawler", action="store_true", help="Active URL discovery")
+    parser.add_argument("-ss","--skip-subdomains", action="store_true", help="Skip subdomain enumeration")
+    parser.add_argument("-sr","--skip-resolution", action="store_true", help="Skip DNS resolution")
+    parser.add_argument("-sw","--skip-web", action="store_true", help="Skip web probing")
     args = parser.parse_args()
 
     target_name, results_path = results_directory()
@@ -63,8 +64,16 @@ def main():
             new_resolved_domains = resolve_domains(to_resolve, old_resolved_domains)
             if new_resolved_domains:
                 save_results(os.path.join(results_path, f"{target_name}_resolved.txt"), new_resolved_domains)
+                old_resolved_domains.update(new_resolved_domains)
                 to_probe.update(new_resolved_domains)
     
+    if args.bruteforce_subdomains:
+        for target in targets:
+            bf_subdomains = bruteforce_subdomains(target, old_resolved_domains)
+            if bf_subdomains:
+                save_results(os.path.join(results_path, f"{target_name}_resolved.txt"), bf_subdomains)
+                to_probe.update(bf_subdomains)
+
     if not args.skip_web:
         if to_probe:
             new_web_services = probe_web_services(to_probe, old_webservices)

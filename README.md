@@ -2,6 +2,7 @@ To do:
 
 - [x] add url crawling
 - [ ] add port scanning
+- [x] add subdomains bruteforce
 - [x] add low hanging fruits testing
   - [x] Scan for open redirects
   - [x] Upgrade LHF module to support different low hanging fruit scans reusing the same code
