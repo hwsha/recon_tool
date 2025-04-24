@@ -5,7 +5,7 @@ from core.subdomains import gather_subdomains
 from core.resolver import resolve_domains
 from core.webprobe import probe_web_services
 from core.urlfinder import passive_url_discovery, active_url_discovery
-from core.lhf import scan_open_redirects
+from core.lhf import scan_low_hanging_fruits
 
 def main():
     parser = argparse.ArgumentParser(description="Passive recon automation script")
@@ -24,7 +24,7 @@ def main():
     results_path_exist = check_path_exist(results_path)
 
     if results_path_exist:
-        print(f"[!] Directory '{results_path}' already exists. Loading results..")
+        print(f"[!] Directory '{results_path}' already exists. Loading old results..")
         old_subdomains, old_resolved_domains, old_webservices, old_urls = load_old_results(results_path,target_name)
     else:
         print(f"[+] Creating directory '{results_path}' for results.")
@@ -88,7 +88,7 @@ def main():
     
     if args.low_hanging_fruit:
         if urls:
-            scan_open_redirects(urls)
+            scan_low_hanging_fruits(urls)
 
 
     print(f"\n[+] Automatic Recon Complete. Results saved in {results_path}/")
