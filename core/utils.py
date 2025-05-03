@@ -1,5 +1,18 @@
 import subprocess
 import os
+import requests
+from core.const import RESOLVERS_FILE, RESOLVERS_URL
+
+def update_resolvers():
+    print("[+] Updating resolvers list...")
+    response = requests.get(RESOLVERS_URL, verify=False)
+    if response.status_code == 200:
+        with open(RESOLVERS_FILE, "w") as f:
+            f.write(response.text)
+        print(f"[+] {RESOLVERS_FILE} updated!")
+    else:
+        print("[-] Failed to download resolvers list.")
+        return
 
 def run_command(command, input_data=None):
     result = subprocess.run(
@@ -22,9 +35,7 @@ def extract_urls(httpx_output):
 def get_diff(new_set, old_set, label="placeholder"):
     diff = new_set - old_set
     if diff:
-        print(f"[+] New {label} found:")
-        for entry in diff:
-            print(entry)
+        print(f"[+] {len(diff)} new {label} found.")
         return diff
     else:
         print(f"[-] No new {label} found.")

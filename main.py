@@ -1,6 +1,6 @@
 import argparse
 import os
-from core.utils import results_directory, check_path_exist, load_old_results, save_results, extract_urls
+from core.utils import results_directory, check_path_exist, load_old_results, save_results, extract_urls, update_resolvers
 from core.subdomains import gather_subdomains, bruteforce_subdomains
 from core.resolver import resolve_domains
 from core.webprobe import probe_web_services
@@ -52,11 +52,14 @@ def main():
         print("[!] Please specify a target (-t) or a file (-f).")
         return
 
+    update_resolvers()
+
     for target in targets:
         if not args.skip_subdomains:
             new_subdomains = gather_subdomains(target, old_subdomains)
             if new_subdomains:
                 save_results(os.path.join(results_path, f"{target_name}_subdomains.txt"), new_subdomains)
+                print(f"[+] Saved to {target_name}_subdomains.txt")
                 to_resolve.update(new_subdomains)
 
     if not args.skip_resolution:
@@ -64,6 +67,7 @@ def main():
             new_resolved_domains = resolve_domains(to_resolve, old_resolved_domains)
             if new_resolved_domains:
                 save_results(os.path.join(results_path, f"{target_name}_resolved.txt"), new_resolved_domains)
+                print(f"[+] Saved to {target_name}_resolved.txt")
                 old_resolved_domains.update(new_resolved_domains)
                 to_probe.update(new_resolved_domains)
     
@@ -72,6 +76,7 @@ def main():
             bf_subdomains = bruteforce_subdomains(target, old_resolved_domains)
             if bf_subdomains:
                 save_results(os.path.join(results_path, f"{target_name}_resolved.txt"), bf_subdomains)
+                print(f"[+] Saved to {target_name}_resolved.txt")
                 to_probe.update(bf_subdomains)
 
     if not args.skip_web:
@@ -79,6 +84,7 @@ def main():
             new_web_services = probe_web_services(to_probe, old_webservices)
             if new_web_services:
                 save_results(os.path.join(results_path, f"{target_name}_webservices.txt"), new_web_services)
+                print(f"[+] Saved to {target_name}_webservices.txt")
                 to_crawl.update(extract_urls(new_web_services))
         
     if args.passive_url_crawler:
@@ -86,6 +92,7 @@ def main():
             new_urls = passive_url_discovery(to_crawl, old_urls)
             if new_urls:
                 save_results(os.path.join(results_path, f"{target_name}_urls.txt"), new_urls)
+                print(f"[+] Saved to {target_name}_urls.txt")
                 urls.update(new_urls)
     
     if args.active_url_crawler:
@@ -93,6 +100,7 @@ def main():
             new_urls = active_url_discovery(to_crawl, old_urls)
             if new_urls:
                 save_results(os.path.join(results_path, f"{target_name}_urls.txt"), new_urls)
+                print(f"[+] Saved to {target_name}_urls.txt")
                 urls.update(new_urls)
     
     if args.low_hanging_fruit:
@@ -100,7 +108,7 @@ def main():
             scan_low_hanging_fruits(urls)
 
 
-    print(f"\n[+] Automatic Recon Complete. Results saved in {results_path}/")
+    print(f"\n[+] Automatic Recon Complete. Results saved in {results_path}.")
 
 if __name__ == "__main__":
     main()

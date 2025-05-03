@@ -1,9 +1,5 @@
 from core.utils import run_command
-
-TEMPLATES = {
-    "open_redirect": "custom-templates/open_redirect.yaml",
-    "reflected_xss": "custom-templates/reflected_xss.yaml"
-}
+from core.const import TEMPLATES
 
 def scan_low_hanging_fruits(urls):
     print("[+] Preparing scan for low hanging fruits...")
